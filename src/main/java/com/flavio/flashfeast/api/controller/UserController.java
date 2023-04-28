@@ -35,4 +35,10 @@ public class UserController {
         List<UserModel> users = userMapper.toCollectionModel(userService.findAll());
         return ResponseEntity.ok(users);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable int id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok().body("deleted user");
+    }
 }

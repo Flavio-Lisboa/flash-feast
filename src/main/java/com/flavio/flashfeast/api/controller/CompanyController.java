@@ -35,4 +35,10 @@ public class CompanyController {
         List<CompanyModel> companies = companyMapper.toCollectionModel(companyService.findAll());
         return ResponseEntity.ok(companies);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCompany(@PathVariable int id) {
+        companyService.deleteCompany(id);
+        return ResponseEntity.ok().body("deleted company");
+    }
 }

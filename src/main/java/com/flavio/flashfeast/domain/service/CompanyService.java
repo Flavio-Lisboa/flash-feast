@@ -32,4 +32,8 @@ public class CompanyService {
     public List<Company> findAll() {
         return companyRepository.findAll();
     }
+
+    public void deleteCompany(int id) {
+        companyRepository.deleteById(id);
+    }
 }
