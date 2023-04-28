@@ -1,5 +1,8 @@
 package com.flavio.flashfeast.api.controller;
 
+import com.flavio.flashfeast.api.mapper.UserMapper;
+import com.flavio.flashfeast.api.model.input.UserInput;
+import com.flavio.flashfeast.api.model.UserModel;
 import com.flavio.flashfeast.domain.entities.User;
 import com.flavio.flashfeast.domain.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -12,20 +15,23 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final UserMapper userMapper;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserMapper userMapper) {
         this.userService = userService;
+        this.userMapper = userMapper;
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User userResponse = userService.createUser(user);
+    public ResponseEntity<UserModel> createUser(@RequestBody UserInput userInput) {
+        User user = userMapper.toEntity(userInput);
+        UserModel userResponse = userMapper.toModel(userService.createUser(user));
         return ResponseEntity.ok(userResponse);
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.findAll();
+    public ResponseEntity<List<UserModel>> getAllUsers() {
+        List<UserModel> users = userMapper.toCollectionModel(userService.findAll());
         return ResponseEntity.ok(users);
     }
 }
