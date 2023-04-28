@@ -5,6 +5,7 @@ import com.flavio.flashfeast.api.model.CompanyModel;
 import com.flavio.flashfeast.api.model.input.CompanyInput;
 import com.flavio.flashfeast.domain.entities.Company;
 import com.flavio.flashfeast.domain.service.CompanyService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,7 +16,7 @@ import java.util.List;
 public class CompanyController {
 
     private final CompanyService companyService;
-    private  final CompanyMapper companyMapper;
+    private final CompanyMapper companyMapper;
 
     public CompanyController(CompanyService companyService, CompanyMapper companyMapper) {
         this.companyService = companyService;
@@ -23,7 +24,7 @@ public class CompanyController {
     }
 
     @PostMapping
-    public ResponseEntity<CompanyModel> createCompany(@RequestBody CompanyInput companyInput) {
+    public ResponseEntity<CompanyModel> createCompany(@Valid @RequestBody CompanyInput companyInput) {
         Company company = companyMapper.toEntity(companyInput);
         CompanyModel companyResponse =  companyMapper.toModel(companyService.createCompany(company));
         return ResponseEntity.ok(companyResponse);

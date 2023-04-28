@@ -24,7 +24,7 @@ public class CompanyService {
                 .password(company.getPassword())
                 .phone(company.getPhone())
                 .role(Role.ROLE_COMPANY)
-                .logo(company.getLogo())
+                .logo("https://logo.com")
                 .build();
         return companyRepository.save(companyBuilder);
     }

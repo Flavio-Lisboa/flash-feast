@@ -5,6 +5,7 @@ import com.flavio.flashfeast.api.model.input.UserInput;
 import com.flavio.flashfeast.api.model.UserModel;
 import com.flavio.flashfeast.domain.entities.User;
 import com.flavio.flashfeast.domain.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserModel> createUser(@RequestBody UserInput userInput) {
+    public ResponseEntity<UserModel> createUser(@Valid @RequestBody UserInput userInput) {
         User user = userMapper.toEntity(userInput);
         UserModel userResponse = userMapper.toModel(userService.createUser(user));
         return ResponseEntity.ok(userResponse);
