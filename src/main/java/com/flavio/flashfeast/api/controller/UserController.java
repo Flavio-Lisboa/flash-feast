@@ -8,9 +8,7 @@ import com.flavio.flashfeast.domain.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -29,6 +27,17 @@ public class UserController {
         User user = userMapper.toEntity(userInput);
         UserModel userResponse = userMapper.toModel(userService.createUser(user));
         return ResponseEntity.ok(userResponse);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserModel> updateUser(@PathVariable int id, @Valid @RequestBody UserInput userInput) {
+        User user = userMapper.toEntity(userInput);
+        User userResponse = userService.updateUser(id, user);
+
+        if(userResponse == null) return ResponseEntity.notFound().build();
+
+        UserModel userModel = userMapper.toModel(userResponse);
+        return ResponseEntity.ok(userModel);
     }
 
     @GetMapping

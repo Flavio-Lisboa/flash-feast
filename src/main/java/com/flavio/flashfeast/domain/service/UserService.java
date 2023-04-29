@@ -4,9 +4,7 @@ import com.flavio.flashfeast.domain.entities.User;
 import com.flavio.flashfeast.domain.enums.Role;
 import com.flavio.flashfeast.domain.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -43,5 +41,17 @@ public class UserService {
 
         userRepository.deleteById(id);
         return true;
+    }
+
+    public User updateUser(int id, User user) {
+        return userRepository.findById(id).map(record -> {
+            record.setFirstName(user.getFirstName());
+            record.setLastName(user.getLastName());
+            record.setEmail(user.getEmail());
+            record.setPassword(user.getPassword());
+            record.setPhone(user.getPhone());
+            record.setCpf(user.getCpf());
+            return userRepository.save(record);
+        }).orElse(null);
     }
 }
