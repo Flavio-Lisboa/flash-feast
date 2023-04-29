@@ -4,6 +4,7 @@ import com.flavio.flashfeast.domain.entities.User;
 import com.flavio.flashfeast.domain.enums.Role;
 import com.flavio.flashfeast.domain.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,7 +36,12 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public void deleteUser(int id) {
+    public boolean deleteUser(int id) {
+        boolean userExists = userRepository.existsById(id);
+
+        if(!userExists) return false;
+
         userRepository.deleteById(id);
+        return true;
     }
 }

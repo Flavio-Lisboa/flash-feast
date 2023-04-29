@@ -33,7 +33,12 @@ public class CompanyService {
         return companyRepository.findAll();
     }
 
-    public void deleteCompany(int id) {
+    public boolean deleteCompany(int id) {
+        boolean companyExists = companyRepository.existsById(id);
+
+        if(!companyExists) return false;
+
         companyRepository.deleteById(id);
+        return true;
     }
 }

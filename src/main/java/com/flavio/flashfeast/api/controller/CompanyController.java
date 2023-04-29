@@ -32,13 +32,18 @@ public class CompanyController {
 
     @GetMapping
     public ResponseEntity<List<CompanyModel>> findAll() {
-        List<CompanyModel> companies = companyMapper.toCollectionModel(companyService.findAll());
-        return ResponseEntity.ok(companies);
+        List<Company> companies = companyService.findAll();
+        if(companies.isEmpty()) return ResponseEntity.noContent().build();
+
+        List<CompanyModel> companiesModel = companyMapper.toCollectionModel(companies);
+        return ResponseEntity.ok(companiesModel);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCompany(@PathVariable int id) {
-        companyService.deleteCompany(id);
-        return ResponseEntity.ok().body("deleted company");
+    public ResponseEntity<Void> deleteCompany(@PathVariable int id) {
+        boolean companyExists = companyService.deleteCompany(id);
+
+        if(companyExists) return ResponseEntity.ok().build();
+        else return ResponseEntity.notFound().build();
     }
 }

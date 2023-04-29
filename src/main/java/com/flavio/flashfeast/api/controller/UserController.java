@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -31,14 +32,19 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserModel>> getAllUsers() {
-        List<UserModel> users = userMapper.toCollectionModel(userService.findAll());
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<UserModel>> findAllUsers() {
+        List<User> users = userService.findAll();
+        if(users.isEmpty()) return ResponseEntity.noContent().build();
+
+        List<UserModel> usersModel = userMapper.toCollectionModel(users);
+        return ResponseEntity.ok(usersModel);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable int id) {
-        userService.deleteUser(id);
-        return ResponseEntity.ok().body("deleted user");
+    public ResponseEntity<Void> deleteUser(@PathVariable int id) {
+        boolean userExists = userService.deleteUser(id);
+
+        if(userExists) return ResponseEntity.ok().build();
+        else return ResponseEntity.notFound().build();
     }
 }
