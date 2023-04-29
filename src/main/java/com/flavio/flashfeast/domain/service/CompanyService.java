@@ -29,6 +29,17 @@ public class CompanyService {
         return companyRepository.save(companyBuilder);
     }
 
+    public Company updateCompany(int id, Company company) {
+        return companyRepository.findById(id).map(record -> {
+            record.setCnpj(company.getCnpj());
+            record.setName(company.getName());
+            record.setEmail(company.getEmail());
+            record.setPassword(company.getPassword());
+            record.setPhone(company.getPhone());
+            return companyRepository.save(record);
+        }).orElse(null);
+    }
+
     public List<Company> findAll() {
         return companyRepository.findAll();
     }

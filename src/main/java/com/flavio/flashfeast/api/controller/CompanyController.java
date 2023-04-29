@@ -30,6 +30,17 @@ public class CompanyController {
         return ResponseEntity.ok(companyResponse);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<CompanyModel> updateUser(@PathVariable int id, @Valid @RequestBody CompanyInput companyInput) {
+        Company company = companyMapper.toEntity(companyInput);
+        Company companyResponse = companyService.updateCompany(id, company);
+
+        if(companyResponse == null) return ResponseEntity.notFound().build();
+
+        CompanyModel companyModel = companyMapper.toModel(companyResponse);
+        return ResponseEntity.ok(companyModel);
+    }
+
     @GetMapping
     public ResponseEntity<List<CompanyModel>> findAll() {
         List<Company> companies = companyService.findAll();
