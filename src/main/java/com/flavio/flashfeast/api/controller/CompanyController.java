@@ -8,6 +8,7 @@ import com.flavio.flashfeast.domain.service.CompanyService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,14 +25,14 @@ public class CompanyController {
     }
 
     @PostMapping
-    public ResponseEntity<CompanyModel> createCompany(@Valid @RequestBody CompanyInput companyInput) {
+    public ResponseEntity<CompanyModel> createCompany(@Valid @ModelAttribute CompanyInput companyInput, @RequestPart("logo") MultipartFile logo) {
         Company company = companyMapper.toEntity(companyInput);
-        CompanyModel companyResponse =  companyMapper.toModel(companyService.createCompany(company));
+        CompanyModel companyResponse =  companyMapper.toModel(companyService.createCompany(company, logo));
         return ResponseEntity.ok(companyResponse);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CompanyModel> updateUser(@PathVariable int id, @Valid @RequestBody CompanyInput companyInput) {
+    public ResponseEntity<CompanyModel> updateCompany(@PathVariable int id, @Valid @RequestBody CompanyInput companyInput) {
         Company company = companyMapper.toEntity(companyInput);
         Company companyResponse = companyService.updateCompany(id, company);
 
