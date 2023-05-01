@@ -5,6 +5,7 @@ import com.cloudinary.utils.ObjectUtils;
 import com.flavio.flashfeast.domain.entities.Company;
 import com.flavio.flashfeast.domain.enums.Role;
 import com.flavio.flashfeast.domain.repository.CompanyRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Service
+@Transactional
 public class CompanyService {
 
     private final CompanyRepository companyRepository;

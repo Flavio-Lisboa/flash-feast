@@ -7,6 +7,8 @@ import lombok.Setter;
 @Setter
 public class CompanyModel {
 
+    private Integer id;
     private String name;
-    private String email;
+    private String phone;
+    private String logo;
 }
