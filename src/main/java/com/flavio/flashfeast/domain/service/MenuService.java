@@ -77,4 +77,16 @@ public class MenuService {
         fileOutputStream.close();
         return convertedLogo;
     }
+
+    public Menu findMenu(int idCompany, int idMenu) {
+        Optional<Menu> menu = menuRepository.findMenu(idCompany, idMenu);
+        return menu.orElse(null);
+    }
+
+    public List<Menu> getMenusByCompanyId(int idCompany) {
+        List<Menu> menuList= menuRepository.getMenusByCompanyId(idCompany);
+
+        if(menuList.isEmpty()) return null;
+        return menuList;
+    }
 }

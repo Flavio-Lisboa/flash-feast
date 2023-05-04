@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 @Setter
 public class MenuModel {
 
+    private Integer id;
     private String name;
     private String category;
     private String description;

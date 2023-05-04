@@ -47,4 +47,24 @@ public class MenuController {
         List<MenuModel> menusModel = menuMapper.toCollectionModel(menus);
         return ResponseEntity.ok(menusModel);
     }
+
+    @GetMapping("/company/{idCompany}")
+    public ResponseEntity<List<MenuModel>> findAllByCompanyId(@PathVariable int idCompany) {
+        List<Menu> menuList = menuService.getMenusByCompanyId(idCompany);
+
+        if(menuList == null) return ResponseEntity.notFound().build();
+
+        List<MenuModel> menuModelList = menuMapper.toCollectionModel(menuList);
+        return ResponseEntity.ok(menuModelList);
+    }
+
+    @GetMapping("/{idMenu}/company/{idCompany}")
+    public ResponseEntity<MenuModel> findMenu(@PathVariable int idCompany, @PathVariable int idMenu) {
+        Menu menu = menuService.findMenu(idCompany, idMenu);
+
+        if(menu == null) return ResponseEntity.notFound().build();
+
+        MenuModel menuModel = menuMapper.toModel(menu);
+        return ResponseEntity.ok(menuModel);
+    }
 }
