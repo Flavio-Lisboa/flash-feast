@@ -28,7 +28,6 @@ public class CompanyService {
     }
 
     public Company createCompany(Company company, MultipartFile logo) {
-        System.out.println(company);
         String logoUrl = uploadFile(logo);
         Company companyBuilder = Company.builder()
                 .cnpj(company.getCnpj())
