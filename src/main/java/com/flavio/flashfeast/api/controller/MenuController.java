@@ -48,7 +48,7 @@ public class MenuController {
         return ResponseEntity.ok(menusModel);
     }
 
-    @GetMapping("/company/{idCompany}")
+    @GetMapping("/companies/{idCompany}")
     public ResponseEntity<List<MenuModel>> findAllByCompanyId(@PathVariable int idCompany) {
         List<Menu> menuList = menuService.getMenusByCompanyId(idCompany);
 
@@ -58,7 +58,7 @@ public class MenuController {
         return ResponseEntity.ok(menuModelList);
     }
 
-    @GetMapping("/{idMenu}/company/{idCompany}")
+    @GetMapping("/{idMenu}/companies/{idCompany}")
     public ResponseEntity<MenuModel> findMenu(@PathVariable int idCompany, @PathVariable int idMenu) {
         Menu menu = menuService.findMenu(idCompany, idMenu);
 
