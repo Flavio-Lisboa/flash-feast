@@ -89,4 +89,13 @@ public class MenuService {
         if(menuList.isEmpty()) return null;
         return menuList;
     }
+
+    public boolean deleteMenuByCompanyId(int idMenu, int idCompany) {
+        boolean menuExists = menuRepository.existsById(idMenu);
+
+        if(!menuExists) return false;
+
+        int checkIfDeleted = menuRepository.deleteMenuByCompanyId(idMenu, idCompany);
+        return checkIfDeleted != 0;
+    }
 }

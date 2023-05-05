@@ -49,7 +49,7 @@ public class MenuController {
     }
 
     @GetMapping("/companies/{idCompany}")
-    public ResponseEntity<List<MenuModel>> findAllByCompanyId(@PathVariable int idCompany) {
+    public ResponseEntity<List<MenuModel>> findMenusByCompanyId(@PathVariable int idCompany) {
         List<Menu> menuList = menuService.getMenusByCompanyId(idCompany);
 
         if(menuList == null) return ResponseEntity.notFound().build();
@@ -66,5 +66,13 @@ public class MenuController {
 
         MenuModel menuModel = menuMapper.toModel(menu);
         return ResponseEntity.ok(menuModel);
+    }
+
+    @DeleteMapping("/{idMenu}/companies/{idCompany}")
+    public ResponseEntity<?> deleteMenuByCompanyId(@PathVariable int idMenu, @PathVariable int idCompany) {
+        boolean menuExists = menuService.deleteMenuByCompanyId(idMenu, idCompany);
+
+        if(!menuExists) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok().build();
     }
 }
