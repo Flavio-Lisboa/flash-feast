@@ -1,21 +1,14 @@
 package com.flavio.flashfeast.domain.service;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import com.flavio.flashfeast.domain.entities.Company;
 import com.flavio.flashfeast.domain.entities.Menu;
 import com.flavio.flashfeast.domain.repository.CompanyRepository;
 import com.flavio.flashfeast.domain.repository.MenuRepository;
+import com.flavio.flashfeast.domain.utils.CloudinaryUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -23,14 +16,13 @@ import java.util.Optional;
 public class MenuService {
 
     private final MenuRepository menuRepository;
-    private final Cloudinary cloudinary;
     private final CompanyRepository companyRepository;
+    private final CloudinaryUtil cloudinaryUtil;
 
-
-    public MenuService(MenuRepository menuRepository, Cloudinary cloudinary, CompanyRepository companyRepository) {
+    public MenuService(MenuRepository menuRepository, CompanyRepository companyRepository, CloudinaryUtil cloudinaryUtil) {
         this.menuRepository = menuRepository;
-        this.cloudinary = cloudinary;
         this.companyRepository = companyRepository;
+        this.cloudinaryUtil = cloudinaryUtil;
     }
 
     public List<Menu> findAll() {
@@ -41,8 +33,8 @@ public class MenuService {
         Optional<Company> companyData = companyRepository.findById(companyId);
         if(companyData.isEmpty()) return null;
 
-        String imageUrl = uploadFile(image);
-
+        String folder = "menu_image";
+        String imageUrl = cloudinaryUtil.uploadFile(image, folder);
         Menu menuBuilder = Menu.builder()
                 .name(menu.getName())
                 .category(menu.getCategory())
@@ -53,29 +45,6 @@ public class MenuService {
                 .company(companyData.get())
                 .build();
         return menuRepository.save(menuBuilder);
-    }
-
-    private String uploadFile(MultipartFile logo) {
-        try {
-            File uploadedLogo = convertMultipartToFile(logo);
-            Map<?, ?> uploadResult = cloudinary.uploader().upload(uploadedLogo, ObjectUtils.asMap("folder", "menu_image"));
-            boolean isDeleted = uploadedLogo.delete();
-
-            if (isDeleted)System.out.println("File successfully deleted");
-            else System.out.println("File doesn't exist");
-
-            return uploadResult.get("secure_url").toString();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private File convertMultipartToFile(MultipartFile logo) throws IOException {
-        File convertedLogo = new File(Objects.requireNonNull(logo.getOriginalFilename()));
-        FileOutputStream fileOutputStream = new FileOutputStream(convertedLogo);
-        fileOutputStream.write(logo.getBytes());
-        fileOutputStream.close();
-        return convertedLogo;
     }
 
     public Menu findMenu(int idCompany, int idMenu) {

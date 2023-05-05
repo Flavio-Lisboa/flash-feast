@@ -1,34 +1,30 @@
 package com.flavio.flashfeast.domain.service;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import com.flavio.flashfeast.domain.entities.Company;
 import com.flavio.flashfeast.domain.enums.Role;
 import com.flavio.flashfeast.domain.repository.CompanyRepository;
+import com.flavio.flashfeast.domain.utils.CloudinaryUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 @Service
 @Transactional
 public class CompanyService {
 
     private final CompanyRepository companyRepository;
-    private final Cloudinary cloudinary;
+    private final CloudinaryUtil cloudinaryUtil;
 
-    public CompanyService(CompanyRepository companyRepository, Cloudinary cloudinary) {
+    public CompanyService(CompanyRepository companyRepository, CloudinaryUtil cloudinaryUtil) {
         this.companyRepository = companyRepository;
-        this.cloudinary = cloudinary;
+        this.cloudinaryUtil = cloudinaryUtil;
     }
 
     public Company createCompany(Company company, MultipartFile logo) {
-        String logoUrl = uploadFile(logo);
+        String folder = "company_logo";
+        String logoUrl = cloudinaryUtil.uploadFile(logo, folder);
         Company companyBuilder = Company.builder()
                 .cnpj(company.getCnpj())
                 .name(company.getName())
@@ -63,28 +59,5 @@ public class CompanyService {
 
         companyRepository.deleteById(id);
         return true;
-    }
-
-    private String uploadFile(MultipartFile logo) {
-        try {
-            File uploadedLogo = convertMultipartToFile(logo);
-            Map<?, ?> uploadResult = cloudinary.uploader().upload(uploadedLogo, ObjectUtils.asMap("folder", "company_logo"));
-            boolean isDeleted = uploadedLogo.delete();
-
-            if (isDeleted)System.out.println("File successfully deleted");
-            else System.out.println("File doesn't exist");
-
-            return uploadResult.get("secure_url").toString();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private File convertMultipartToFile(MultipartFile logo) throws IOException {
-        File convertedLogo = new File(Objects.requireNonNull(logo.getOriginalFilename()));
-        FileOutputStream fileOutputStream = new FileOutputStream(convertedLogo);
-        fileOutputStream.write(logo.getBytes());
-        fileOutputStream.close();
-        return convertedLogo;
     }
 }
