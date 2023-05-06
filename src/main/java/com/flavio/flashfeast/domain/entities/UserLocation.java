@@ -17,8 +17,11 @@ public class UserLocation {
     @Id
     @Column(name = "user_id")
     private Integer userId;
+    @Column(name = "zip_code")
+    private String zipcode;
     private String state;
     private String city;
+    private String neighborhood;
     private String street;
 
     @Column(name = "house_number")

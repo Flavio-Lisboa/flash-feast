@@ -7,8 +7,10 @@ import lombok.Setter;
 @Setter
 public class UserLocationInput {
 
+    private String zipcode;
     private String state;
     private String city;
+    private String neighborhood;
     private String street;
     private String houseNumber;
 }
