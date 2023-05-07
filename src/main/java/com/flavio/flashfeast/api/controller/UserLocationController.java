@@ -5,6 +5,7 @@ import com.flavio.flashfeast.api.model.UserLocationModel;
 import com.flavio.flashfeast.api.model.input.UserLocationInput;
 import com.flavio.flashfeast.domain.entities.UserLocation;
 import com.flavio.flashfeast.domain.service.UserLocationService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +33,7 @@ public class UserLocationController {
 
     @PostMapping("/{idUser}")
     public ResponseEntity<UserLocationModel> createUserLocation(@PathVariable int idUser,
-                                                                @RequestBody UserLocationInput userLocationInput) {
+                                                                @Valid @RequestBody UserLocationInput userLocationInput) {
         UserLocation userLocation = userLocationMapper.toEntity(userLocationInput);
         UserLocation userLocationResponse = userLocationService.createUserLocation(idUser, userLocation);
 
@@ -44,7 +45,7 @@ public class UserLocationController {
 
     @PutMapping ("/{idUser}")
     public ResponseEntity<UserLocationModel> updateUserLocation(@PathVariable int idUser,
-                                                                @RequestBody UserLocationInput userLocationInput) {
+                                                                @Valid @RequestBody UserLocationInput userLocationInput) {
         UserLocation userLocation = userLocationMapper.toEntity(userLocationInput);
         UserLocation userLocationResponse = userLocationService.updateUserLocation(idUser, userLocation);
 
