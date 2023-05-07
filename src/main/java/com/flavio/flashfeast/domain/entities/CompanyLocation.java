@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @Entity
-@Table(name = "user_location")
-public class UserLocation {
+@Table(name = "company_location")
+public class CompanyLocation {
 
     @Id
-    @Column(name = "user_id")
-    private Integer userId;
+    @Column(name = "company_id")
+    private Integer companyId;
     @Column(name = "zip_code")
     private String zipcode;
     private String state;
@@ -24,6 +24,6 @@ public class UserLocation {
     private String neighborhood;
     private String street;
 
-    @Column(name = "house_number")
-    private String houseNumber;
+    @Column(name = "company_number")
+    private String companyNumber;
 }

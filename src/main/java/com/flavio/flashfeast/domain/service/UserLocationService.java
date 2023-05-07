@@ -3,9 +3,11 @@ package com.flavio.flashfeast.domain.service;
 import com.flavio.flashfeast.domain.entities.UserLocation;
 import com.flavio.flashfeast.domain.repository.UserLocationRepository;
 import com.flavio.flashfeast.domain.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 public class UserLocationService {
 
     private final UserLocationRepository userLocationRepository;

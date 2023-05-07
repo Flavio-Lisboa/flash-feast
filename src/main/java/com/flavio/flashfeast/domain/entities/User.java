@@ -30,8 +30,4 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "user_id")
-    private UserLocation userLocation;
 }
