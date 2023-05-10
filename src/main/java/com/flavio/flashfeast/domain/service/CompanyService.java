@@ -68,7 +68,7 @@ public class CompanyService {
     }
 
     public void emailExists(Company company) {
-        boolean emailExists = companyRepository.findByEmail(company.getEmail()).stream().anyMatch(existingUser -> !existingUser.equals(company));
+        boolean emailExists = companyRepository.findByEmail(company.getEmail()).stream().anyMatch(existingCompany-> !existingCompany.equals(company));
         if(emailExists) throw new DomainException("there is already a registered company with this email");
     }
 }
