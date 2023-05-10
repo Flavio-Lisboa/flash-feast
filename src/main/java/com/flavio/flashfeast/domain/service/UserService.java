@@ -2,6 +2,7 @@ package com.flavio.flashfeast.domain.service;
 
 import com.flavio.flashfeast.domain.entities.User;
 import com.flavio.flashfeast.domain.enums.Role;
+import com.flavio.flashfeast.domain.exception.DomainException;
 import com.flavio.flashfeast.domain.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,8 @@ public class UserService {
     }
 
     public User createUser(User user) {
+        emailExists(user);
+
         User userBuilder = User.builder()
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
@@ -44,6 +47,9 @@ public class UserService {
     }
 
     public User updateUser(int id, User user) {
+        user.setId(id);
+        emailExists(user);
+
         return userRepository.findById(id).map(record -> {
             record.setFirstName(user.getFirstName());
             record.setLastName(user.getLastName());
@@ -53,5 +59,10 @@ public class UserService {
             record.setCpf(user.getCpf());
             return userRepository.save(record);
         }).orElse(null);
+    }
+
+    public void emailExists(User user) {
+        boolean emailExists = userRepository.findByEmail(user.getEmail()).stream().anyMatch(existingUser -> !existingUser.equals(user));
+        if(emailExists) throw new DomainException("there is already a registered user with this email");
     }
 }

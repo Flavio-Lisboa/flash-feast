@@ -2,6 +2,7 @@ package com.flavio.flashfeast.domain.service;
 
 import com.flavio.flashfeast.domain.entities.Company;
 import com.flavio.flashfeast.domain.enums.Role;
+import com.flavio.flashfeast.domain.exception.DomainException;
 import com.flavio.flashfeast.domain.repository.CompanyRepository;
 import com.flavio.flashfeast.domain.utils.CloudinaryUtil;
 import jakarta.transaction.Transactional;
@@ -23,6 +24,8 @@ public class CompanyService {
     }
 
     public Company createCompany(Company company, MultipartFile logo) {
+        emailExists(company);
+
         String folder = "company_logo";
         String logoUrl = cloudinaryUtil.uploadFile(logo, folder);
         Company companyBuilder = Company.builder()
@@ -38,6 +41,9 @@ public class CompanyService {
     }
 
     public Company updateCompany(int id, Company company) {
+        company.setId(id);
+        emailExists(company);
+
         return companyRepository.findById(id).map(record -> {
             record.setCnpj(company.getCnpj());
             record.setName(company.getName());
@@ -59,5 +65,10 @@ public class CompanyService {
 
         companyRepository.deleteById(id);
         return true;
+    }
+
+    public void emailExists(Company company) {
+        boolean emailExists = companyRepository.findByEmail(company.getEmail()).stream().anyMatch(existingUser -> !existingUser.equals(company));
+        if(emailExists) throw new DomainException("there is already a registered company with this email");
     }
 }
