@@ -2,7 +2,8 @@ package com.flavio.flashfeast.domain.service;
 
 import com.flavio.flashfeast.domain.entities.User;
 import com.flavio.flashfeast.domain.enums.Role;
-import com.flavio.flashfeast.domain.exception.DomainException;
+import com.flavio.flashfeast.domain.exception.AlreadyExistsException;
+import com.flavio.flashfeast.domain.exception.NotFoundException;
 import com.flavio.flashfeast.domain.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -37,13 +38,12 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public boolean deleteUser(int id) {
+    public void deleteUser(int id) {
         boolean userExists = userRepository.existsById(id);
 
-        if(!userExists) return false;
+        if(!userExists) throw new NotFoundException("User Not Found");
 
         userRepository.deleteById(id);
-        return true;
     }
 
     public User updateUser(int id, User user) {
@@ -58,11 +58,11 @@ public class UserService {
             record.setPhone(user.getPhone());
             record.setCpf(user.getCpf());
             return userRepository.save(record);
-        }).orElse(null);
+        }).orElseThrow(() -> new NotFoundException("User Not Found"));
     }
 
     public void emailExists(User user) {
         boolean emailExists = userRepository.findByEmail(user.getEmail()).stream().anyMatch(existingUser -> !existingUser.equals(user));
-        if(emailExists) throw new DomainException("there is already a registered user with this email");
+        if(emailExists) throw new AlreadyExistsException("there is already a registered user with this email");
     }
 }

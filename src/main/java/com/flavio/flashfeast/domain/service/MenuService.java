@@ -2,6 +2,7 @@ package com.flavio.flashfeast.domain.service;
 
 import com.flavio.flashfeast.domain.entities.Company;
 import com.flavio.flashfeast.domain.entities.Menu;
+import com.flavio.flashfeast.domain.exception.NotFoundException;
 import com.flavio.flashfeast.domain.repository.CompanyRepository;
 import com.flavio.flashfeast.domain.repository.MenuRepository;
 import com.flavio.flashfeast.domain.utils.CloudinaryUtil;
@@ -31,7 +32,7 @@ public class MenuService {
 
     public Menu createMenu(int companyId, Menu menu, MultipartFile image) {
         Optional<Company> companyData = companyRepository.findById(companyId);
-        if(companyData.isEmpty()) return null;
+        if(companyData.isEmpty()) throw new NotFoundException("Company Not Found");
 
         String folder = "menu_image";
         String imageUrl = cloudinaryUtil.uploadFile(image, folder);
@@ -49,32 +50,30 @@ public class MenuService {
 
     public Menu findMenu(int idCompany, int idMenu) {
         Optional<Menu> menu = menuRepository.findMenu(idCompany, idMenu);
-        return menu.orElse(null);
+        return menu.orElseThrow(() -> new NotFoundException("Menu Not Found"));
     }
 
     public List<Menu> getMenusByCompanyId(int idCompany) {
         List<Menu> menuList= menuRepository.getMenusByCompanyId(idCompany);
-
-        if(menuList.isEmpty()) return null;
+        if(menuList.isEmpty()) throw new NotFoundException("Menus Not Found");
         return menuList;
     }
 
-    public boolean deleteMenuByCompanyId(int idMenu, int idCompany) {
+    public void deleteMenuByCompanyId(int idMenu, int idCompany) {
         boolean menuExists = menuRepository.existsById(idMenu);
+        if(!menuExists) throw new NotFoundException("Menu Not Found");
 
-        if(!menuExists) return false;
-
-        int checkIfDeleted = menuRepository.deleteMenuByCompanyId(idMenu, idCompany);
-        return checkIfDeleted != 0;
+        menuRepository.deleteMenuByCompanyId(idMenu, idCompany);
     }
 
     public Menu updateMenu(int idMenu, int idCompany, Menu menu) {
         boolean menuExists = menuRepository.existsById(idMenu);
+        if(!menuExists) throw new NotFoundException("Menu Not Found");
 
-        if(!menuExists) return null;
+        boolean companyExist = companyRepository.existsById(idCompany);
+        if(!companyExist) throw new NotFoundException("Company Not Found");
 
-        int checkIfUpdated = menuRepository.updateMenu(idMenu, idCompany, menu);
-        if(checkIfUpdated == 1) return menuRepository.findById(idMenu).get();
-        return null;
+        menuRepository.updateMenu(idMenu, idCompany, menu);
+        return menuRepository.findById(idMenu).get();
     }
 }

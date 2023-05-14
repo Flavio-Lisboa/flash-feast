@@ -28,7 +28,6 @@ public class MenuController {
     @GetMapping
     public ResponseEntity<List<MenuModel>> findAll() {
         List<Menu> menus = menuService.findAll();
-        if(menus.isEmpty()) return ResponseEntity.noContent().build();
 
         List<MenuModel> menusModel = menuMapper.toCollectionModel(menus);
         return ResponseEntity.ok(menusModel);
@@ -38,8 +37,6 @@ public class MenuController {
     public ResponseEntity<List<MenuModel>> findMenusByCompanyId(@PathVariable int idCompany) {
         List<Menu> menuList = menuService.getMenusByCompanyId(idCompany);
 
-        if(menuList == null) return ResponseEntity.notFound().build();
-
         List<MenuModel> menuModelList = menuMapper.toCollectionModel(menuList);
         return ResponseEntity.ok(menuModelList);
     }
@@ -47,8 +44,6 @@ public class MenuController {
     @GetMapping("/{idMenu}/companies/{idCompany}")
     public ResponseEntity<MenuModel> findMenu(@PathVariable int idCompany, @PathVariable int idMenu) {
         Menu menu = menuService.findMenu(idCompany, idMenu);
-
-        if(menu == null) return ResponseEntity.notFound().build();
 
         MenuModel menuModel = menuMapper.toModel(menu);
         return ResponseEntity.ok(menuModel);
@@ -62,8 +57,6 @@ public class MenuController {
         Menu menu = menuMapper.toEntity(menuInput);
         Menu menuResponse = menuService.createMenu(companyId, menu, image);
 
-        if (menuResponse == null) return ResponseEntity.notFound().build();
-
         MenuModel menuModel = menuMapper.toModel(menuResponse);
         return ResponseEntity.ok(menuModel);
     }
@@ -72,7 +65,6 @@ public class MenuController {
     public ResponseEntity<MenuModel> updateMenu(@PathVariable int idMenu, @PathVariable int idCompany, @Valid @RequestBody MenuInput menuInput) {
         Menu menu = menuMapper.toEntity(menuInput);
         Menu menuResponse = menuService.updateMenu(idMenu, idCompany, menu);
-        if(menuResponse == null) return ResponseEntity.notFound().build();
 
         MenuModel menuModel = menuMapper.toModel(menuResponse);
         return ResponseEntity.ok(menuModel);
@@ -80,9 +72,7 @@ public class MenuController {
 
     @DeleteMapping("/{idMenu}/companies/{idCompany}")
     public ResponseEntity<?> deleteMenuByCompanyId(@PathVariable int idMenu, @PathVariable int idCompany) {
-        boolean menuExists = menuService.deleteMenuByCompanyId(idMenu, idCompany);
-
-        if(!menuExists) return ResponseEntity.notFound().build();
+        menuService.deleteMenuByCompanyId(idMenu, idCompany);
         return ResponseEntity.ok().build();
     }
 }

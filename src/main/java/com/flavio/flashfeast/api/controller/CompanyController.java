@@ -36,8 +36,6 @@ public class CompanyController {
         Company company = companyMapper.toEntity(companyInput);
         Company companyResponse = companyService.updateCompany(id, company);
 
-        if(companyResponse == null) return ResponseEntity.notFound().build();
-
         CompanyModel companyModel = companyMapper.toModel(companyResponse);
         return ResponseEntity.ok(companyModel);
     }
@@ -45,7 +43,6 @@ public class CompanyController {
     @GetMapping
     public ResponseEntity<List<CompanyModel>> findAll() {
         List<Company> companies = companyService.findAll();
-        if(companies.isEmpty()) return ResponseEntity.noContent().build();
 
         List<CompanyModel> companiesModel = companyMapper.toCollectionModel(companies);
         return ResponseEntity.ok(companiesModel);
@@ -53,9 +50,7 @@ public class CompanyController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCompany(@PathVariable int id) {
-        boolean companyExists = companyService.deleteCompany(id);
-
-        if(companyExists) return ResponseEntity.ok().build();
-        else return ResponseEntity.notFound().build();
+        companyService.deleteCompany(id);
+        return ResponseEntity.ok().build();
     }
 }

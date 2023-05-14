@@ -7,13 +7,13 @@ import com.flavio.flashfeast.domain.entities.Menu;
 import com.flavio.flashfeast.domain.entities.User;
 import com.flavio.flashfeast.domain.enums.Status;
 import com.flavio.flashfeast.domain.exception.DomainException;
+import com.flavio.flashfeast.domain.exception.NotFoundException;
 import com.flavio.flashfeast.domain.repository.CompanyRepository;
 import com.flavio.flashfeast.domain.repository.CurrentOrderRepository;
 import com.flavio.flashfeast.domain.repository.MenuRepository;
 import com.flavio.flashfeast.domain.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -36,9 +36,9 @@ public class CurrentOrderService {
     }
 
     public void createOrder(int idCompany, int idMenu, int idUser, CurrentOrderInput currentOrderInput) {
-        Company company = companyRepository.findById(idCompany).orElse(null);
-        Menu menu = menuRepository.findById(idMenu).orElse(null);
-        User user = userRepository.findById(idUser).orElse(null);
+        Company company = companyRepository.findById(idCompany).orElseThrow(() -> new NotFoundException("Company Not Found"));
+        Menu menu = menuRepository.findById(idMenu).orElseThrow(() -> new NotFoundException("Menu Not Found"));
+        User user = userRepository.findById(idUser).orElseThrow(() -> new NotFoundException("User Not Found"));
 
         assert menu != null;
         if(menu.getAvailableQuantity() < currentOrderInput.getQuantity()) throw new DomainException("Order an appropriate amount");

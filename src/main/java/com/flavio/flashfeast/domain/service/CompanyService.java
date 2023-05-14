@@ -2,14 +2,13 @@ package com.flavio.flashfeast.domain.service;
 
 import com.flavio.flashfeast.domain.entities.Company;
 import com.flavio.flashfeast.domain.enums.Role;
-import com.flavio.flashfeast.domain.exception.DomainException;
+import com.flavio.flashfeast.domain.exception.AlreadyExistsException;
+import com.flavio.flashfeast.domain.exception.NotFoundException;
 import com.flavio.flashfeast.domain.repository.CompanyRepository;
 import com.flavio.flashfeast.domain.utils.CloudinaryUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -52,24 +51,22 @@ public class CompanyService {
             record.setPassword(company.getPassword());
             record.setPhone(company.getPhone());
             return companyRepository.save(record);
-        }).orElse(null);
+        }).orElseThrow(() -> new NotFoundException("Company Not Found"));
     }
 
     public List<Company> findAll() {
         return companyRepository.findAll();
     }
 
-    public boolean deleteCompany(int id) {
+    public void deleteCompany(int id) {
         boolean companyExists = companyRepository.existsById(id);
-
-        if(!companyExists) return false;
+        if(!companyExists) throw new NotFoundException("Company Not Found");
 
         companyRepository.deleteById(id);
-        return true;
     }
 
     public void emailExists(Company company) {
         boolean emailExists = companyRepository.findByEmail(company.getEmail()).stream().anyMatch(existingCompany-> !existingCompany.equals(company));
-        if(emailExists) throw new DomainException("there is already a registered company with this email");
+        if(emailExists) throw new AlreadyExistsException("there is already a registered company with this email");
     }
 }

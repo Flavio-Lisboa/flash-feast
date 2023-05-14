@@ -34,8 +34,6 @@ public class UserController {
         User user = userMapper.toEntity(userInput);
         User userResponse = userService.updateUser(id, user);
 
-        if(userResponse == null) return ResponseEntity.notFound().build();
-
         UserModel userModel = userMapper.toModel(userResponse);
         return ResponseEntity.ok(userModel);
     }
@@ -51,9 +49,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable int id) {
-        boolean userExists = userService.deleteUser(id);
-
-        if(userExists) return ResponseEntity.ok().build();
-        else return ResponseEntity.notFound().build();
+        userService.deleteUser(id);
+        return ResponseEntity.ok().build();
     }
 }

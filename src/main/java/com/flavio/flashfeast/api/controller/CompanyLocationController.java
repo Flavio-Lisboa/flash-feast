@@ -25,8 +25,6 @@ public class CompanyLocationController {
     public ResponseEntity<CompanyLocationModel> getLocation(@PathVariable int idCompany) {
         CompanyLocation companyLocation = companyLocationService.getUserLocation(idCompany);
 
-        if(companyLocation == null) return ResponseEntity.notFound().build();
-
         CompanyLocationModel companyLocationModel = companyLocationMapper.toModel(companyLocation);
         return ResponseEntity.ok(companyLocationModel);
     }
@@ -37,8 +35,6 @@ public class CompanyLocationController {
             @Valid @RequestBody CompanyLocationInput companyLocationInput) {
         CompanyLocation companyLocation = companyLocationMapper.toEntity(companyLocationInput);
         CompanyLocation companyLocationResponse = companyLocationService.createCompanyLocation(idCompany, companyLocation);
-
-        if(companyLocationResponse == null) return ResponseEntity.badRequest().build();
 
         CompanyLocationModel companyLocationModel = companyLocationMapper.toModel(companyLocationResponse);
         return ResponseEntity.ok(companyLocationModel);
@@ -51,18 +47,13 @@ public class CompanyLocationController {
         CompanyLocation companyLocation = companyLocationMapper.toEntity(companyLocationInput);
         CompanyLocation companyLocationResponse = companyLocationService.updateUserLocation(idCompany, companyLocation);
 
-        if(companyLocationResponse == null) return ResponseEntity.badRequest().build();
-
         CompanyLocationModel companyLocationModel = companyLocationMapper.toModel(companyLocationResponse);
         return ResponseEntity.ok(companyLocationModel);
     }
 
     @DeleteMapping("/{idCompany}")
     public ResponseEntity<?> deleteCompanyLocation(@PathVariable int idCompany) {
-        boolean successfullyDeleted = companyLocationService.deleteCompanyLocation(idCompany);
-
-        if(!successfullyDeleted) return ResponseEntity.notFound().build();
-
+        companyLocationService.deleteCompanyLocation(idCompany);
         return ResponseEntity.ok().build();
     }
 }

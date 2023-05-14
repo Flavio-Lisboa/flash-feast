@@ -2,7 +2,9 @@ package com.flavio.flashfeast.api.exceptionhandler;
 
 import com.flavio.flashfeast.api.exceptionhandler.representation.Fields;
 import com.flavio.flashfeast.api.exceptionhandler.representation.Problem;
+import com.flavio.flashfeast.domain.exception.AlreadyExistsException;
 import com.flavio.flashfeast.domain.exception.DomainException;
+import com.flavio.flashfeast.domain.exception.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -40,12 +42,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
             fieldsList.add(new Fields(name, message));
         }
-        Problem problem = new Problem();
-        problem.setStatus(status.value());
-        problem.setOffsetDateTime(dateTimeFormatter.format(OffsetDateTime.now()));
-        problem.setTitle("One or more fields are invalid");
-        problem.setFieldsRepresentation(fieldsList);
-
+        Problem problem = buildProblem(status.value(), "One or more fields are invalid", fieldsList);
         return handleExceptionInternal(ex, problem, headers, status, request);
     }
 
@@ -53,11 +50,31 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleDomainException(DomainException exception, WebRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
-        Problem problem = new Problem();
-        problem.setStatus(status.value());
-        problem.setOffsetDateTime(dateTimeFormatter.format(OffsetDateTime.now()));
-        problem.setTitle(exception.getMessage());
-
+        Problem problem = buildProblem(status.value(), exception.getMessage());
         return handleExceptionInternal(exception, problem, new HttpHeaders(), status, request);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Object> handleNotFoundException(NotFoundException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+
+        Problem problem = buildProblem(status.value(), exception.getMessage());
+        return handleExceptionInternal(exception, problem, new HttpHeaders(), status, request);
+    }
+
+    @ExceptionHandler(AlreadyExistsException.class)
+    public ResponseEntity<Object> handleAlreadyExistsException(AlreadyExistsException exception, WebRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+
+        Problem problem = buildProblem(status.value(), exception.getMessage());
+        return handleExceptionInternal(exception, problem, new HttpHeaders(), status, request);
+    }
+
+    private Problem buildProblem(Integer status, String title) {
+        return new Problem(status, dateTimeFormatter.format(OffsetDateTime.now()), title);
+    }
+
+    private Problem buildProblem(Integer status, String title, List<Fields> fieldsList) {
+        return new Problem(status, dateTimeFormatter.format(OffsetDateTime.now()), title, fieldsList);
     }
 }

@@ -25,8 +25,6 @@ public class UserLocationController {
     public ResponseEntity<UserLocationModel> getUserLocation(@PathVariable int idUser) {
         UserLocation userLocation = userLocationService.getUserLocation(idUser);
 
-        if(userLocation == null) return ResponseEntity.notFound().build();
-
         UserLocationModel userLocationModel = userLocationMapper.toModel(userLocation);
         return ResponseEntity.ok(userLocationModel);
     }
@@ -36,8 +34,6 @@ public class UserLocationController {
                                                                 @Valid @RequestBody UserLocationInput userLocationInput) {
         UserLocation userLocation = userLocationMapper.toEntity(userLocationInput);
         UserLocation userLocationResponse = userLocationService.createUserLocation(idUser, userLocation);
-
-        if(userLocationResponse == null) return ResponseEntity.badRequest().build();
 
         UserLocationModel userLocationModel = userLocationMapper.toModel(userLocationResponse);
         return ResponseEntity.ok(userLocationModel);
@@ -49,18 +45,13 @@ public class UserLocationController {
         UserLocation userLocation = userLocationMapper.toEntity(userLocationInput);
         UserLocation userLocationResponse = userLocationService.updateUserLocation(idUser, userLocation);
 
-        if(userLocationResponse == null) return ResponseEntity.badRequest().build();
-
         UserLocationModel userLocationModel = userLocationMapper.toModel(userLocationResponse);
         return ResponseEntity.ok(userLocationModel);
     }
 
     @DeleteMapping("/{idUser}")
     public ResponseEntity<?> deleteUserLocation(@PathVariable int idUser) {
-        boolean successfullyDeleted = userLocationService.deleteUserLocation(idUser);
-
-        if(!successfullyDeleted) return ResponseEntity.notFound().build();
-
+        userLocationService.deleteUserLocation(idUser);
         return ResponseEntity.ok().build();
     }
 }

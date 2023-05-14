@@ -1,6 +1,8 @@
 package com.flavio.flashfeast.domain.service;
 
 import com.flavio.flashfeast.domain.entities.CompanyLocation;
+import com.flavio.flashfeast.domain.exception.AlreadyExistsException;
+import com.flavio.flashfeast.domain.exception.NotFoundException;
 import com.flavio.flashfeast.domain.repository.CompanyLocationRepository;
 import com.flavio.flashfeast.domain.repository.CompanyRepository;
 import jakarta.transaction.Transactional;
@@ -19,17 +21,15 @@ public class CompanyLocationService {
     }
 
     public CompanyLocation getUserLocation(int idCompany) {
-        return companyLocationRepository.findById(idCompany).orElse(null);
+        return companyLocationRepository.findById(idCompany).orElseThrow(() -> new NotFoundException("Location Not Found"));
     }
 
     public CompanyLocation createCompanyLocation(int idCompany, CompanyLocation companyLocation) {
-        boolean exists = companyLocationRepository.existsById(idCompany);
-
-        if(exists) return null;
-
         boolean company = companyRepository.existsById(idCompany);
+        if(!company) throw new NotFoundException("Company Not Found");
 
-        if(!company) return null;
+        boolean exists = companyLocationRepository.existsById(idCompany);
+        if(exists) throw new AlreadyExistsException("Location Already Exists");
 
         companyLocation.setCompanyId(idCompany);
         return companyLocationRepository.save(companyLocation);
@@ -37,19 +37,16 @@ public class CompanyLocationService {
 
     public CompanyLocation updateUserLocation(int idCompany, CompanyLocation companyLocation) {
         boolean exists = companyLocationRepository.existsById(idCompany);
-
-        if(!exists) return null;
+        if(!exists) throw new NotFoundException("Location Not Found");
 
         companyLocation.setCompanyId(idCompany);
         return companyLocationRepository.save(companyLocation);
     }
 
-    public boolean deleteCompanyLocation(int idCompany) {
-        boolean exists = companyRepository.existsById(idCompany);
-
-        if(!exists) return false;
+    public void deleteCompanyLocation(int idCompany) {
+        boolean exists = companyLocationRepository.existsById(idCompany);
+        if(!exists) throw new NotFoundException("Location Not Found");
 
         companyLocationRepository.deleteById(idCompany);
-        return true;
     }
 }

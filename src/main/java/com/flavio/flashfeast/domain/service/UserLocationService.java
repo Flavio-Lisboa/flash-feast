@@ -1,6 +1,8 @@
 package com.flavio.flashfeast.domain.service;
 
 import com.flavio.flashfeast.domain.entities.UserLocation;
+import com.flavio.flashfeast.domain.exception.AlreadyExistsException;
+import com.flavio.flashfeast.domain.exception.NotFoundException;
 import com.flavio.flashfeast.domain.repository.UserLocationRepository;
 import com.flavio.flashfeast.domain.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -23,31 +25,26 @@ public class UserLocationService {
     }
 
     public UserLocation createUserLocation(int idUser, UserLocation userLocation) {
-        boolean exists = userLocationRepository.existsById(idUser);
-
-        if(exists) return null;
-
         boolean user = userRepository.existsById(idUser);
+        if(!user) throw new NotFoundException("User Not Found");
 
-        if(!user) return null;
+        boolean exists = userLocationRepository.existsById(idUser);
+        if(exists) throw new AlreadyExistsException("Location Already Exists");
 
         userLocation.setUserId(idUser);
         return userLocationRepository.save(userLocation);
     }
 
-    public boolean deleteUserLocation(int idUser) {
+    public void deleteUserLocation(int idUser) {
         boolean exists = userLocationRepository.existsById(idUser);
-
-        if(!exists) return false;
+        if(!exists) throw new NotFoundException("Location Not Found");
 
         userLocationRepository.deleteById(idUser);
-        return true;
     }
 
     public UserLocation updateUserLocation(int idUser, UserLocation userLocation) {
         boolean exists = userLocationRepository.existsById(idUser);
-
-        if(!exists) return null;
+        if(!exists) throw new NotFoundException("Location Not Found");
 
         userLocation.setUserId(idUser);
         return userLocationRepository.save(userLocation);
