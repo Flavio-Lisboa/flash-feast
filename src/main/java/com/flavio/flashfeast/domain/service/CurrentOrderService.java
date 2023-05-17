@@ -40,7 +40,6 @@ public class CurrentOrderService {
         Menu menu = menuRepository.findById(idMenu).orElseThrow(() -> new NotFoundException("Menu Not Found"));
         User user = userRepository.findById(idUser).orElseThrow(() -> new NotFoundException("User Not Found"));
 
-        assert menu != null;
         if(menu.getAvailableQuantity() < currentOrderInput.getQuantity()) throw new DomainException("Order an appropriate amount");
         int newAvailableQuantity = menu.getAvailableQuantity() - currentOrderInput.getQuantity();
         menu.setAvailableQuantity(newAvailableQuantity);
@@ -61,5 +60,11 @@ public class CurrentOrderService {
                 .user(user)
                 .build();
         currentOrderRepository.save(currentOrder);
+    }
+
+    public void deleteOrder(int idOrder) {
+        boolean exists = currentOrderRepository.existsById(idOrder);
+        if(!exists) throw new NotFoundException("Order Not Found");
+        currentOrderRepository.deleteById(idOrder);
     }
 }

@@ -21,4 +21,10 @@ public class CurrentOrderController {
         currentOrderService.createOrder(idCompany, idMenu, idUser, currentOrderInput);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/{idOrder}")
+    public ResponseEntity<?> deleteOrder(@PathVariable int idOrder) {
+        currentOrderService.deleteOrder(idOrder);
+        return ResponseEntity.ok().build();
+    }
 }
