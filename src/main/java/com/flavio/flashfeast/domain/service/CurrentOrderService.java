@@ -54,7 +54,7 @@ public class CurrentOrderService {
                 .image(menu.getImage())
                 .status(Status.WAITING_FOR_COMPANY)
                 .dateTime(new Date())
-                .expirationTime(System.currentTimeMillis() + 1000 * 60 * 60 * 2) //2h
+                .expirationTime(System.currentTimeMillis() + 1000 * 60 * 30) //30min
                 .company(company)
                 .menu(menu)
                 .user(user)
@@ -62,9 +62,40 @@ public class CurrentOrderService {
         currentOrderRepository.save(currentOrder);
     }
 
+    public void confirmAnOrder(int idOrder) {
+        changeStatus(idOrder, Status.ACCEPTED);
+    }
+
+    public void inPreparation(int idOrder) {
+        changeStatus(idOrder, Status.IN_PREPARATION);
+    }
+
+    public void onRouteDelivery(int idOrder) {
+        changeStatus(idOrder, Status.ON_ROUTE_DELIVERY);
+    }
+
+    public void delivered(int idOrder) {
+        changeStatus(idOrder, Status.DELIVERED);
+    }
+
+    public void canceled(int idOrder) {
+        changeStatus(idOrder, Status.CANCELED);
+    }
+
     public void deleteOrder(int idOrder) {
         boolean exists = currentOrderRepository.existsById(idOrder);
         if(!exists) throw new NotFoundException("Order Not Found");
         currentOrderRepository.deleteById(idOrder);
+    }
+
+    public CurrentOrder orderExists(int idOrder) {
+        return currentOrderRepository.findById(idOrder).orElseThrow(() -> new NotFoundException("Oder Not Found"));
+    }
+
+    public void changeStatus(int idOrder, Status statusEnum) {
+        CurrentOrder currentOrder = orderExists(idOrder);
+        currentOrder.setStatus(statusEnum);
+        currentOrder.setExpirationTime(System.currentTimeMillis() + 1000 * 60 * 30); //30min
+        currentOrderRepository.save(currentOrder);
     }
 }
