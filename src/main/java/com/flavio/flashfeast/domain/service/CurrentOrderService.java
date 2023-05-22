@@ -63,23 +63,23 @@ public class CurrentOrderService {
     }
 
     public void confirmAnOrder(int idOrder) {
-        changeStatus(idOrder, Status.ACCEPTED);
+        changeStatus(idOrder, Status.ACCEPTED, Status.WAITING_FOR_COMPANY);
     }
 
     public void inPreparation(int idOrder) {
-        changeStatus(idOrder, Status.IN_PREPARATION);
+        changeStatus(idOrder, Status.IN_PREPARATION, Status.ACCEPTED);
     }
 
     public void onRouteDelivery(int idOrder) {
-        changeStatus(idOrder, Status.ON_ROUTE_DELIVERY);
+        changeStatus(idOrder, Status.ON_ROUTE_DELIVERY, Status.IN_PREPARATION);
     }
 
     public void delivered(int idOrder) {
-        changeStatus(idOrder, Status.DELIVERED);
+        changeStatus(idOrder, Status.DELIVERED, Status.ON_ROUTE_DELIVERY);
     }
 
     public void canceled(int idOrder) {
-        changeStatus(idOrder, Status.CANCELED);
+        changeStatusToCanceled(idOrder);
     }
 
     public void deleteOrder(int idOrder) {
@@ -92,10 +92,24 @@ public class CurrentOrderService {
         return currentOrderRepository.findById(idOrder).orElseThrow(() -> new NotFoundException("Oder Not Found"));
     }
 
-    public void changeStatus(int idOrder, Status statusEnum) {
+    public void changeStatus(int idOrder, Status statusEnum, Status currentStatus) {
         CurrentOrder currentOrder = orderExists(idOrder);
+        if(currentOrder.getStatus() == statusEnum) throw new DomainException("This is already the current status");
+        if(currentOrder.getStatus() != currentStatus) throw new DomainException("Change to correct status");
+
         currentOrder.setStatus(statusEnum);
         currentOrder.setExpirationTime(System.currentTimeMillis() + 1000 * 60 * 30); //30min
+        currentOrderRepository.save(currentOrder);
+    }
+
+    public void changeStatusToCanceled(int idOrder) {
+        CurrentOrder currentOrder = orderExists(idOrder);
+        if(currentOrder.getStatus() == Status.CANCELED) throw new DomainException("This is already the current status");
+        if(currentOrder.getStatus() == Status.ON_ROUTE_DELIVERY || currentOrder.getStatus() == Status.DELIVERED)
+            throw new DomainException("You cannot cancel this order");
+
+        currentOrder.setStatus(Status.CANCELED);
+        currentOrder.setExpirationTime(0L); //30min
         currentOrderRepository.save(currentOrder);
     }
 }
