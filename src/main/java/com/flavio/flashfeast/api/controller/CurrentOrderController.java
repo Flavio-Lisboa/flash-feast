@@ -1,8 +1,11 @@
 package com.flavio.flashfeast.api.controller;
 
+import com.flavio.flashfeast.api.mapper.CurrentOrderMapper;
+import com.flavio.flashfeast.api.model.CurrentOrderModel;
 import com.flavio.flashfeast.api.model.input.CurrentOrderInput;
 import com.flavio.flashfeast.domain.entities.CurrentOrder;
 import com.flavio.flashfeast.domain.service.CurrentOrderService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,15 +14,28 @@ import org.springframework.web.bind.annotation.*;
 public class CurrentOrderController {
 
     private final CurrentOrderService currentOrderService;
+    private final CurrentOrderMapper currentOrderMapper;
 
-    public CurrentOrderController(CurrentOrderService currentOrderService) {
+    public CurrentOrderController(CurrentOrderService currentOrderService, CurrentOrderMapper currentOrderMapper) {
         this.currentOrderService = currentOrderService;
+        this.currentOrderMapper = currentOrderMapper;
+    }
+
+    @GetMapping("/{idOder}")
+    public ResponseEntity<CurrentOrderModel> getOrder(@PathVariable int idOder) {
+        CurrentOrder currentOrder = currentOrderService.getOrder(idOder);
+
+        CurrentOrderModel currentOrderModel = currentOrderMapper.toModel(currentOrder);
+        return ResponseEntity.ok(currentOrderModel);
     }
 
     @PostMapping("/companies/{idCompany}/menus/{idMenu}/users/{idUser}")
-    public ResponseEntity<CurrentOrder> createOrder(@PathVariable int idCompany, @PathVariable int idMenu, @PathVariable int idUser, @RequestBody CurrentOrderInput currentOrderInput) {
-        currentOrderService.createOrder(idCompany, idMenu, idUser, currentOrderInput);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<CurrentOrderModel> createOrder(@PathVariable int idCompany, @PathVariable int idMenu, @PathVariable int idUser, @Valid @RequestBody CurrentOrderInput currentOrderInput) {
+        CurrentOrder currentOrder = currentOrderMapper.toEntity(currentOrderInput);
+        CurrentOrder currentOrderResponse = currentOrderService.createOrder(idCompany, idMenu, idUser, currentOrder);
+
+        CurrentOrderModel currentOrderModel = currentOrderMapper.toModel(currentOrderResponse);
+        return ResponseEntity.ok(currentOrderModel);
     }
 
     @PostMapping("/{idOrder}/accepted")

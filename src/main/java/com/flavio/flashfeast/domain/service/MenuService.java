@@ -20,7 +20,8 @@ public class MenuService {
     private final CompanyRepository companyRepository;
     private final CloudinaryUtil cloudinaryUtil;
 
-    public MenuService(MenuRepository menuRepository, CompanyRepository companyRepository, CloudinaryUtil cloudinaryUtil) {
+    public MenuService(MenuRepository menuRepository, CompanyRepository companyRepository,
+                       CloudinaryUtil cloudinaryUtil) {
         this.menuRepository = menuRepository;
         this.companyRepository = companyRepository;
         this.cloudinaryUtil = cloudinaryUtil;

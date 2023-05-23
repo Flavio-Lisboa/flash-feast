@@ -62,7 +62,8 @@ public class UserService {
     }
 
     public void emailExists(User user) {
-        boolean emailExists = userRepository.findByEmail(user.getEmail()).stream().anyMatch(existingUser -> !existingUser.equals(user));
+        boolean emailExists = userRepository.findByEmail(user.getEmail())
+                .stream().anyMatch(existingUser -> !existingUser.equals(user));
         if(emailExists) throw new AlreadyExistsException("there is already a registered user with this email");
     }
 }
