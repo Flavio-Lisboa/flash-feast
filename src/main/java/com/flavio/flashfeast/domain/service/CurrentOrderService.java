@@ -51,8 +51,6 @@ public class CurrentOrderService {
         int newAvailableQuantity = menu.getAvailableQuantity() - currentOrder.getQuantity();
         menu.setAvailableQuantity(newAvailableQuantity);
 
-        menuService.updateMenu(idMenu, idCompany, menu);
-
         BigDecimal totalPrice = menu.getPrice().multiply(BigDecimal.valueOf(currentOrder.getQuantity()));
         CurrentOrder currentOrderBuilder = CurrentOrder.builder()
                 .name(menu.getName())
@@ -66,7 +64,10 @@ public class CurrentOrderService {
                 .menu(menu)
                 .user(user)
                 .build();
-        return currentOrderRepository.save(currentOrderBuilder);
+
+        CurrentOrder currentOrderResponse = currentOrderRepository.save(currentOrderBuilder);
+        menuService.updateMenu(idMenu, idCompany, menu);
+        return currentOrderResponse;
     }
 
     public void deleteOrder(int idOrder) {
@@ -102,6 +103,7 @@ public class CurrentOrderService {
         if(currentOrder.getStatus() == Status.ON_ROUTE_DELIVERY || currentOrder.getStatus() == Status.DELIVERED)
             throw new DomainException("You cannot cancel this order");
 
+        returnQuantityToMenu(currentOrder.getMenu().getId(), currentOrder.getQuantity());
         currentOrder.setStatus(Status.CANCELED);
         currentOrderRepository.save(currentOrder);
     }
