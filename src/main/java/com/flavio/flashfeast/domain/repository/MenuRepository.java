@@ -21,7 +21,7 @@ public interface MenuRepository extends JpaRepository<Menu, Integer> {
 
     @Modifying
     @Query("DELETE FROM Menu m WHERE m.id = :idMenu AND m.company.id = :idCompany")
-    int deleteMenuByCompanyId(int idMenu, int idCompany);
+    void deleteMenuByCompanyId(int idMenu, int idCompany);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Menu m SET m.name = :#{#menu.name}," +
@@ -31,5 +31,5 @@ public interface MenuRepository extends JpaRepository<Menu, Integer> {
             " m.price = :#{#menu.price} " +
             "WHERE m.id = :idMenu " +
             "AND m.company.id = :idCompany")
-    int updateMenu(int idMenu, int idCompany, @Param("menu") Menu menu);
+    void updateMenu(int idMenu, int idCompany, @Param("menu") Menu menu);
 }
