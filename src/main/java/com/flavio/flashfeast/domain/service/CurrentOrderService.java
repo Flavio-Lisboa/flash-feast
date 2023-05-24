@@ -99,6 +99,13 @@ public class CurrentOrderService {
 
     public void changeStatusToCanceled(int idOrder) {
         CurrentOrder currentOrder = orderExists(idOrder);
+
+        if(isExpired(currentOrder.getExpirationTime())) {
+            returnQuantityToMenu(currentOrder.getMenu().getId(), currentOrder.getQuantity());
+            deleteOrder(idOrder);
+            throw new DomainException("This order has expired and will be deleted");
+        }
+
         if(currentOrder.getStatus() == Status.CANCELED) throw new DomainException("This is already the current status");
         if(currentOrder.getStatus() == Status.ON_ROUTE_DELIVERY || currentOrder.getStatus() == Status.DELIVERED)
             throw new DomainException("You cannot cancel this order");
