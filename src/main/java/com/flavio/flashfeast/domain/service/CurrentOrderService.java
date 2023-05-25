@@ -24,14 +24,16 @@ public class CurrentOrderService {
     private final MenuRepository menuRepository;
     private final MenuService menuService;
     private final UserRepository userRepository;
+    private final FinishedOrderService finishedOrderService;
 
     public CurrentOrderService(CurrentOrderRepository currentOrderRepository, CompanyRepository companyRepository,
-                               MenuRepository menuRepository, MenuService menuService, UserRepository userRepository) {
+                               MenuRepository menuRepository, MenuService menuService, UserRepository userRepository, FinishedOrderService finishedOrderService) {
         this.currentOrderRepository = currentOrderRepository;
         this.companyRepository = companyRepository;
         this.menuRepository = menuRepository;
         this.menuService = menuService;
         this.userRepository = userRepository;
+        this.finishedOrderService = finishedOrderService;
     }
 
     public CurrentOrder getOrder(int idOrder) {
@@ -59,7 +61,7 @@ public class CurrentOrderService {
                 .image(menu.getImage())
                 .status(Status.WAITING_FOR_COMPANY)
                 .dateTime(new Date())
-                .expirationTime(System.currentTimeMillis() + 1000 * 60 * 30) //30min
+                .expirationTime(System.currentTimeMillis()) //30min
                 .company(company)
                 .menu(menu)
                 .user(user)
@@ -76,15 +78,17 @@ public class CurrentOrderService {
         currentOrderRepository.deleteById(idOrder);
     }
 
-    public CurrentOrder orderExists(int idOrder) {
+    private CurrentOrder orderExists(int idOrder) {
         return currentOrderRepository.findById(idOrder).orElseThrow(() -> new NotFoundException("Oder Not Found"));
     }
 
-    public void changeStatus(int idOrder, Status statusEnum, Status currentStatus) {
+    private CurrentOrder changeStatus(int idOrder, Status statusEnum, Status currentStatus) {
         CurrentOrder currentOrder = orderExists(idOrder);
 
         if(isExpired(currentOrder.getExpirationTime())) {
             returnQuantityToMenu(currentOrder.getMenu().getId(), currentOrder.getQuantity());
+            currentOrder.setStatus(Status.EXPIRED);
+            finishedOrderService.createFinishedOrder(currentOrder);
             deleteOrder(idOrder);
             throw new DomainException("This order has expired and will be deleted");
         }
@@ -94,14 +98,16 @@ public class CurrentOrderService {
 
         currentOrder.setStatus(statusEnum);
         currentOrder.setExpirationTime(System.currentTimeMillis() + 1000 * 60 * 30); //30min
-        currentOrderRepository.save(currentOrder);
+        return currentOrderRepository.save(currentOrder);
     }
 
-    public void changeStatusToCanceled(int idOrder) {
+    private void changeStatusToCanceled(int idOrder) {
         CurrentOrder currentOrder = orderExists(idOrder);
 
         if(isExpired(currentOrder.getExpirationTime())) {
             returnQuantityToMenu(currentOrder.getMenu().getId(), currentOrder.getQuantity());
+            currentOrder.setStatus(Status.EXPIRED);
+            finishedOrderService.createFinishedOrder(currentOrder);
             deleteOrder(idOrder);
             throw new DomainException("This order has expired and will be deleted");
         }
@@ -112,14 +118,15 @@ public class CurrentOrderService {
 
         returnQuantityToMenu(currentOrder.getMenu().getId(), currentOrder.getQuantity());
         currentOrder.setStatus(Status.CANCELED);
-        currentOrderRepository.save(currentOrder);
+        finishedOrderService.createFinishedOrder(currentOrder);
+        deleteOrder(idOrder);
     }
 
-    public boolean isExpired(Long expirationTime) {
+    private boolean isExpired(Long expirationTime) {
         return System.currentTimeMillis() > expirationTime;
     }
 
-    public void returnQuantityToMenu(int idMenu, int quantity) {
+    private void returnQuantityToMenu(int idMenu, int quantity) {
         Menu menu = menuRepository.findById(idMenu).orElseThrow(() -> new NotFoundException("Menu Not Found"));
         menu.setAvailableQuantity(menu.getAvailableQuantity() + quantity);
         menuRepository.save(menu);
@@ -138,7 +145,9 @@ public class CurrentOrderService {
     }
 
     public void delivered(int idOrder) {
-        changeStatus(idOrder, Status.DELIVERED, Status.ON_ROUTE_DELIVERY);
+        CurrentOrder currentOrder = changeStatus(idOrder, Status.DELIVERED, Status.ON_ROUTE_DELIVERY);
+        finishedOrderService.createFinishedOrder(currentOrder);
+        deleteOrder(idOrder);
     }
 
     public void canceled(int idOrder) {

@@ -7,5 +7,6 @@ public enum Status {
     CANCELED,
     IN_PREPARATION,
     ON_ROUTE_DELIVERY,
-    DELIVERED
+    DELIVERED,
+    EXPIRED
 }
