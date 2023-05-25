@@ -61,7 +61,7 @@ public class CurrentOrderService {
                 .image(menu.getImage())
                 .status(Status.WAITING_FOR_COMPANY)
                 .dateTime(new Date())
-                .expirationTime(System.currentTimeMillis()) //30min
+                .expirationTime(System.currentTimeMillis() + 1000 * 60 * 30) //30min
                 .company(company)
                 .menu(menu)
                 .user(user)
