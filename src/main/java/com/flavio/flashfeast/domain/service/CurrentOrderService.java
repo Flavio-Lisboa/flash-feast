@@ -86,11 +86,7 @@ public class CurrentOrderService {
         CurrentOrder currentOrder = orderExists(idOrder);
 
         if(isExpired(currentOrder.getExpirationTime())) {
-            returnQuantityToMenu(currentOrder.getMenu().getId(), currentOrder.getQuantity());
-            currentOrder.setStatus(Status.EXPIRED);
-            finishedOrderService.createFinishedOrder(currentOrder);
-            deleteOrder(idOrder);
-            throw new DomainException("This order has expired and will be deleted");
+            deleteExpiredOrder(currentOrder);
         }
 
         if(currentOrder.getStatus() == statusEnum) throw new DomainException("This is already the current status");
@@ -105,11 +101,7 @@ public class CurrentOrderService {
         CurrentOrder currentOrder = orderExists(idOrder);
 
         if(isExpired(currentOrder.getExpirationTime())) {
-            returnQuantityToMenu(currentOrder.getMenu().getId(), currentOrder.getQuantity());
-            currentOrder.setStatus(Status.EXPIRED);
-            finishedOrderService.createFinishedOrder(currentOrder);
-            deleteOrder(idOrder);
-            throw new DomainException("This order has expired and will be deleted");
+            deleteExpiredOrder(currentOrder);
         }
 
         if(currentOrder.getStatus() == Status.CANCELED) throw new DomainException("This is already the current status");
@@ -130,6 +122,14 @@ public class CurrentOrderService {
         Menu menu = menuRepository.findById(idMenu).orElseThrow(() -> new NotFoundException("Menu Not Found"));
         menu.setAvailableQuantity(menu.getAvailableQuantity() + quantity);
         menuRepository.save(menu);
+    }
+
+    private void deleteExpiredOrder(CurrentOrder currentOrder) {
+        returnQuantityToMenu(currentOrder.getMenu().getId(), currentOrder.getQuantity());
+        currentOrder.setStatus(Status.EXPIRED);
+        finishedOrderService.createFinishedOrder(currentOrder);
+        deleteOrder(currentOrder.getId());
+        throw new DomainException("This order has expired and will be deleted");
     }
 
     public void confirmAnOrder(int idOrder) {
