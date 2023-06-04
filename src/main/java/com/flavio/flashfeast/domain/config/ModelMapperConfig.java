@@ -1,4 +1,4 @@
-package com.flavio.flashfeast.domain.common;
+package com.flavio.flashfeast.domain.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
