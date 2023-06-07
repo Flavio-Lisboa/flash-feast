@@ -26,14 +26,14 @@ public class CompanyController {
         this.companyMapper = companyMapper;
     }
 
-    @PostMapping("/auth")
+    @PostMapping
     public ResponseEntity<CompanyModel> createCompany(@Valid @ModelAttribute CompanyInput companyInput, @RequestPart("logo") MultipartFile logo) {
         Company company = companyMapper.toEntity(companyInput);
         CompanyModel companyResponse =  companyMapper.toModel(companyService.createCompany(company, logo));
         return ResponseEntity.ok(companyResponse);
     }
 
-    @PostMapping
+    @PostMapping("/auth")
     public ResponseEntity<AuthenticationResponseModel> authenticate(@RequestBody LoginInput loginInput) {
         AuthenticationResponseModel authResponse = companyService.authenticate(loginInput);
         return ResponseEntity.ok(authResponse);

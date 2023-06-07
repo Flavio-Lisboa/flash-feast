@@ -61,7 +61,7 @@ public class CompanyService {
                 )
         );
         Company company = companyRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new NotFoundException("CompanyNotFound"));
+                .orElseThrow(() -> new NotFoundException("Company Not Found"));
 
         String token = jwtService.generateToken(company);
         return AuthenticationResponseModel.builder()
