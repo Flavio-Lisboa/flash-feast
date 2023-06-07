@@ -1,6 +1,8 @@
 package com.flavio.flashfeast.api.controller;
 
 import com.flavio.flashfeast.api.mapper.UserMapper;
+import com.flavio.flashfeast.api.model.AuthenticationResponseModel;
+import com.flavio.flashfeast.api.model.input.LoginInput;
 import com.flavio.flashfeast.api.model.input.UserInput;
 import com.flavio.flashfeast.api.model.UserModel;
 import com.flavio.flashfeast.domain.entities.User;
@@ -27,6 +29,12 @@ public class UserController {
         User user = userMapper.toEntity(userInput);
         UserModel userResponse = userMapper.toModel(userService.createUser(user));
         return ResponseEntity.ok(userResponse);
+    }
+
+    @PostMapping("/auth")
+    public ResponseEntity<AuthenticationResponseModel> authenticate(@RequestBody LoginInput loginInput) {
+        AuthenticationResponseModel authResponse = userService.authenticate(loginInput);
+        return ResponseEntity.ok(authResponse);
     }
 
     @PutMapping("/{id}")

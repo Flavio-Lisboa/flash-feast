@@ -1,8 +1,10 @@
 package com.flavio.flashfeast.api.controller;
 
 import com.flavio.flashfeast.api.mapper.CompanyMapper;
+import com.flavio.flashfeast.api.model.AuthenticationResponseModel;
 import com.flavio.flashfeast.api.model.CompanyModel;
 import com.flavio.flashfeast.api.model.input.CompanyInput;
+import com.flavio.flashfeast.api.model.input.LoginInput;
 import com.flavio.flashfeast.domain.entities.Company;
 import com.flavio.flashfeast.domain.service.CompanyService;
 import jakarta.validation.Valid;
@@ -24,11 +26,17 @@ public class CompanyController {
         this.companyMapper = companyMapper;
     }
 
-    @PostMapping
+    @PostMapping("/auth")
     public ResponseEntity<CompanyModel> createCompany(@Valid @ModelAttribute CompanyInput companyInput, @RequestPart("logo") MultipartFile logo) {
         Company company = companyMapper.toEntity(companyInput);
         CompanyModel companyResponse =  companyMapper.toModel(companyService.createCompany(company, logo));
         return ResponseEntity.ok(companyResponse);
+    }
+
+    @PostMapping
+    public ResponseEntity<AuthenticationResponseModel> authenticate(@RequestBody LoginInput loginInput) {
+        AuthenticationResponseModel authResponse = companyService.authenticate(loginInput);
+        return ResponseEntity.ok(authResponse);
     }
 
     @PutMapping("/{id}")

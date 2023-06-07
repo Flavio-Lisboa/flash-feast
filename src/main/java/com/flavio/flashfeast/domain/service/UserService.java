@@ -1,11 +1,16 @@
 package com.flavio.flashfeast.domain.service;
 
+import com.flavio.flashfeast.api.model.AuthenticationResponseModel;
+import com.flavio.flashfeast.api.model.input.LoginInput;
 import com.flavio.flashfeast.domain.entities.User;
 import com.flavio.flashfeast.domain.enums.Role;
 import com.flavio.flashfeast.domain.exception.AlreadyExistsException;
 import com.flavio.flashfeast.domain.exception.NotFoundException;
 import com.flavio.flashfeast.domain.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -14,9 +19,15 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
     }
 
     public User createUser(User user) {
@@ -26,12 +37,28 @@ public class UserService {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
-                .password(user.getPassword())
+                .password(passwordEncoder.encode(user.getPassword()))
                 .phone(user.getPhone())
                 .cpf(user.getCpf())
                 .role(Role.ROLE_USER)
                 .build();
         return userRepository.save(userBuilder);
+    }
+
+    public AuthenticationResponseModel authenticate(LoginInput request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new NotFoundException("User Not Found"));
+
+        String token = jwtService.generateToken(user);
+        return AuthenticationResponseModel.builder()
+                .token(token)
+                .build();
     }
 
     public List<User> findAll() {

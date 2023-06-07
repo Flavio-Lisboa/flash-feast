@@ -1,12 +1,17 @@
 package com.flavio.flashfeast.domain.service;
 
-import com.flavio.flashfeast.domain.entities.Company;
+import com.flavio.flashfeast.api.model.AuthenticationResponseModel;
+import com.flavio.flashfeast.api.model.input.LoginInput;
+import  com.flavio.flashfeast.domain.entities.Company;
 import com.flavio.flashfeast.domain.enums.Role;
 import com.flavio.flashfeast.domain.exception.AlreadyExistsException;
 import com.flavio.flashfeast.domain.exception.NotFoundException;
 import com.flavio.flashfeast.domain.repository.CompanyRepository;
 import com.flavio.flashfeast.domain.utils.CloudinaryUtil;
 import jakarta.transaction.Transactional;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
@@ -17,10 +22,18 @@ public class CompanyService {
 
     private final CompanyRepository companyRepository;
     private final CloudinaryUtil cloudinaryUtil;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
-    public CompanyService(CompanyRepository companyRepository, CloudinaryUtil cloudinaryUtil) {
+    public CompanyService(CompanyRepository companyRepository, CloudinaryUtil cloudinaryUtil,
+                          PasswordEncoder passwordEncoder, JwtService jwtService,
+                          AuthenticationManager authenticationManager) {
         this.companyRepository = companyRepository;
         this.cloudinaryUtil = cloudinaryUtil;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
     }
 
     public Company createCompany(Company company, MultipartFile logo) {
@@ -32,12 +45,28 @@ public class CompanyService {
                 .cnpj(company.getCnpj())
                 .name(company.getName())
                 .email(company.getEmail())
-                .password(company.getPassword())
+                .password(passwordEncoder.encode(company.getPassword()))
                 .phone(company.getPhone())
                 .role(Role.ROLE_COMPANY)
                 .logo(logoUrl)
                 .build();
         return companyRepository.save(companyBuilder);
+    }
+
+    public AuthenticationResponseModel authenticate(LoginInput request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+        Company company = companyRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new NotFoundException("CompanyNotFound"));
+
+        String token = jwtService.generateToken(company);
+        return AuthenticationResponseModel.builder()
+                .token(token)
+                .build();
     }
 
     public Company updateCompany(int id, Company company) {
