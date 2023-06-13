@@ -14,5 +14,5 @@ public class CompanyMenuModel {
     private Integer companyId;
     private String companyName;
     private String companyLogo;
-    private List<MenuModel> menus;
+    private List<MenuWithoutCompanyDataModel> menus;
 }

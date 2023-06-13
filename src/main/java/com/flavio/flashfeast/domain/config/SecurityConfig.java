@@ -35,10 +35,18 @@ public class SecurityConfig {
 
                 .requestMatchers(
                         HttpMethod.GET,
-                        "/api/v1/menus"
+                        "/api/v1/menus",
+                        "/api/v1/menus/companies/{idCompany}",
+                        "/api/v1/menus/{idMenu}/companies/{idCompany}"
                 )
                 .permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/v1/orders/companies/{idCompany}/menus/{idMenu}/users/{idUser}").hasAuthority("ROLE_USER")
+
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/v1/orders/companies/{idCompany}/menus/{idMenu}/users/{idUser}"
+                )
+                .hasAuthority("ROLE_USER")
+
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()

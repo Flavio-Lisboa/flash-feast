@@ -1,6 +1,6 @@
 package com.flavio.flashfeast.domain.service;
 
-import com.flavio.flashfeast.api.mapper.MenuMapper;
+import com.flavio.flashfeast.api.mapper.MenuWithoutCompanyDataMapper;
 import com.flavio.flashfeast.api.model.CompanyMenuModel;
 import com.flavio.flashfeast.domain.entities.Company;
 import com.flavio.flashfeast.domain.entities.Menu;
@@ -23,14 +23,14 @@ public class MenuService {
     private final MenuRepository menuRepository;
     private final CompanyRepository companyRepository;
     private final CloudinaryUtil cloudinaryUtil;
-    private final MenuMapper menuMapper;
+    private final MenuWithoutCompanyDataMapper menuWithoutCompanyDataMapperMapper;
 
     public MenuService(MenuRepository menuRepository, CompanyRepository companyRepository,
-                       CloudinaryUtil cloudinaryUtil, MenuMapper menuMapper) {
+                       CloudinaryUtil cloudinaryUtil, MenuWithoutCompanyDataMapper menuWithoutCompanyDataMapperMapper) {
         this.menuRepository = menuRepository;
         this.companyRepository = companyRepository;
         this.cloudinaryUtil = cloudinaryUtil;
-        this.menuMapper = menuMapper;
+        this.menuWithoutCompanyDataMapperMapper = menuWithoutCompanyDataMapperMapper;
     }
 
     public List<CompanyMenuModel> findAll() {
@@ -45,7 +45,7 @@ public class MenuService {
                         .companyId(company.getId())
                         .companyName(company.getName())
                         .companyLogo(company.getLogo())
-                        .menus(menuMapper.toCollectionModel(menus))
+                        .menus(menuWithoutCompanyDataMapperMapper.toCollectionModel(menus))
                         .build();
                 companyMenuModelList.add(companyMenuModel);
             }

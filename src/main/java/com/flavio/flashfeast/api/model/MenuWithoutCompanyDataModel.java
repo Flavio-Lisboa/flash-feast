@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-public class MenuModel {
+public class MenuWithoutCompanyDataModel {
 
     private Integer id;
     private String name;
@@ -16,5 +16,4 @@ public class MenuModel {
     private Integer availableQuantity;
     private BigDecimal price;
     private String image;
-    private CompanyModel company;
 }
