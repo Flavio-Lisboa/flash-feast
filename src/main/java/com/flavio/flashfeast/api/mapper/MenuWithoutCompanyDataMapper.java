@@ -17,7 +17,6 @@ public class MenuWithoutCompanyDataMapper {
     private final ModelMapper modelMapper;
 
     public MenuWithoutCompanyDataModel toModel(Menu menu) {
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
         return modelMapper.map(menu, MenuWithoutCompanyDataModel.class);
     }
 
