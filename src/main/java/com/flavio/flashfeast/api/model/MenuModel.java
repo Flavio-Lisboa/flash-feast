@@ -16,5 +16,4 @@ public class MenuModel {
     private Integer availableQuantity;
     private BigDecimal price;
     private String image;
-    private CompanyModel company;
 }

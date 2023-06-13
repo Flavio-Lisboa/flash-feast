@@ -1,5 +1,7 @@
 package com.flavio.flashfeast.domain.service;
 
+import com.flavio.flashfeast.api.mapper.MenuMapper;
+import com.flavio.flashfeast.api.model.CompanyMenuModel;
 import com.flavio.flashfeast.domain.entities.Company;
 import com.flavio.flashfeast.domain.entities.Menu;
 import com.flavio.flashfeast.domain.exception.NotFoundException;
@@ -9,6 +11,8 @@ import com.flavio.flashfeast.domain.utils.CloudinaryUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,16 +23,35 @@ public class MenuService {
     private final MenuRepository menuRepository;
     private final CompanyRepository companyRepository;
     private final CloudinaryUtil cloudinaryUtil;
+    private final MenuMapper menuMapper;
 
     public MenuService(MenuRepository menuRepository, CompanyRepository companyRepository,
-                       CloudinaryUtil cloudinaryUtil) {
+                       CloudinaryUtil cloudinaryUtil, MenuMapper menuMapper) {
         this.menuRepository = menuRepository;
         this.companyRepository = companyRepository;
         this.cloudinaryUtil = cloudinaryUtil;
+        this.menuMapper = menuMapper;
     }
 
-    public List<Menu> findAll() {
-        return menuRepository.findAll();
+    public List<CompanyMenuModel> findAll() {
+        List<CompanyMenuModel> companyMenuModelList = new ArrayList<>();
+
+        List<Company> companies = companyRepository.findAll();
+        companies.forEach(company -> {
+            List<Menu> menus = menuRepository.getMenusByCompanyId(company.getId());
+
+            if(!menus.isEmpty()) {
+                CompanyMenuModel companyMenuModel = CompanyMenuModel.builder()
+                        .companyId(company.getId())
+                        .companyName(company.getName())
+                        .companyLogo(company.getLogo())
+                        .menus(menuMapper.toCollectionModel(menus))
+                        .build();
+                companyMenuModelList.add(companyMenuModel);
+            }
+        });
+
+        return companyMenuModelList;
     }
 
     public Menu createMenu(int companyId, Menu menu, MultipartFile image) {

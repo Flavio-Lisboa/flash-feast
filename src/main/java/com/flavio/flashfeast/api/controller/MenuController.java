@@ -1,6 +1,7 @@
 package com.flavio.flashfeast.api.controller;
 
 import com.flavio.flashfeast.api.mapper.MenuMapper;
+import com.flavio.flashfeast.api.model.CompanyMenuModel;
 import com.flavio.flashfeast.api.model.MenuModel;
 import com.flavio.flashfeast.api.model.input.MenuInput;
 import com.flavio.flashfeast.domain.entities.Menu;
@@ -26,11 +27,9 @@ public class MenuController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MenuModel>> findAll() {
-        List<Menu> menus = menuService.findAll();
-
-        List<MenuModel> menusModel = menuMapper.toCollectionModel(menus);
-        return ResponseEntity.ok(menusModel);
+    public ResponseEntity<List<CompanyMenuModel>> findAll() {
+        List<CompanyMenuModel> menus = menuService.findAll();
+        return ResponseEntity.ok(menus);
     }
 
     @GetMapping("/companies/{idCompany}")
@@ -61,7 +60,7 @@ public class MenuController {
         return ResponseEntity.ok(menuModel);
     }
 
-    @PutMapping("{idMenu}/companies/{idCompany}")
+    @PutMapping("/{idMenu}/companies/{idCompany}")
     public ResponseEntity<MenuModel> updateMenu(@PathVariable int idMenu, @PathVariable int idCompany, @Valid @RequestBody MenuInput menuInput) {
         Menu menu = menuMapper.toEntity(menuInput);
         Menu menuResponse = menuService.updateMenu(idMenu, idCompany, menu);

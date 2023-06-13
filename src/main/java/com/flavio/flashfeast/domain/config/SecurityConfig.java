@@ -3,6 +3,7 @@ package com.flavio.flashfeast.domain.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,10 +24,22 @@ public class SecurityConfig {
         http
             .csrf().disable()
             .authorizeHttpRequests()
-                .requestMatchers("")
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/v1/users",
+                        "/api/v1/users/auth",
+                        "/api/v1/companies",
+                        "/api/v1/companies/auth"
+                )
                 .permitAll()
-                .anyRequest()
-                .authenticated()
+
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/v1/menus"
+                )
+                .permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/orders/companies/{idCompany}/menus/{idMenu}/users/{idUser}").hasAuthority("ROLE_USER")
+                .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

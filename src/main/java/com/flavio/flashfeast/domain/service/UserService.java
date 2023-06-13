@@ -81,7 +81,7 @@ public class UserService {
             record.setFirstName(user.getFirstName());
             record.setLastName(user.getLastName());
             record.setEmail(user.getEmail());
-            record.setPassword(user.getPassword());
+            record.setPassword(passwordEncoder.encode(user.getPassword()));
             record.setPhone(user.getPhone());
             record.setCpf(user.getCpf());
             return userRepository.save(record);
