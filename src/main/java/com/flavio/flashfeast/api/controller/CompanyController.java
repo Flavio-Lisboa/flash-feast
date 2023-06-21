@@ -26,6 +26,7 @@ public class CompanyController {
         this.companyMapper = companyMapper;
     }
 
+    @CrossOrigin
     @PostMapping
     public ResponseEntity<CompanyModel> createCompany(@Valid @ModelAttribute CompanyInput companyInput, @RequestPart("logo") MultipartFile logo) {
         Company company = companyMapper.toEntity(companyInput);

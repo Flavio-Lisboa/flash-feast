@@ -26,6 +26,7 @@ public class MenuController {
         this.menuMapper = menuMapper;
     }
 
+    @CrossOrigin
     @GetMapping
     public ResponseEntity<List<CompanyMenuModel>> findAll() {
         List<CompanyMenuModel> menus = menuService.findAll();
